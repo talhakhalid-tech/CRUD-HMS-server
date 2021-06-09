@@ -8,7 +8,6 @@ router.get("/all", async (req, res) => {
     const sql = `SELECT * FROM ward`;
     mysql.query(sql, function (error, results) {
       if (error) throw error;
-      console.log(results);
       res.status(201).json({ wards: results });
     });
   } catch (error) {
@@ -51,6 +50,38 @@ router.patch("/update", async (req, res) => {
     mysql.query(sql, function (error, results) {
       if (error) throw error;
       res.status(201).json({ message: "Updated Ward Data Successfully" });
+    });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
+router.get("/relatedPatients", async (req, res) => {
+  try {
+    const sql = `SELECT ward.W_id,patient.P_id,patient.P_Name,patient.P_Disease,patient.P_BedNo
+    FROM ward
+    RIGHT JOIN patient
+    ON ward.W_id = patient.W_id
+    WHERE patient.W_id = ${req.query.WId};`;
+    mysql.query(sql, function (error, results) {
+      if (error) throw error;
+      res.status(200).json({ patients: results });
+    });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
+router.get("/relatedNurses", async (req, res) => {
+  try {
+    const sql = `SELECT ward.W_id,nurse.N_id,nurse.N_Name,nurse.N_Position,nurse.N_CellNo,nurse.N_Shift
+    FROM ward
+    RIGHT JOIN nurse
+    ON ward.W_id = nurse.W_id
+    WHERE nurse.W_id = ${req.query.WId};`;
+    mysql.query(sql, function (error, results) {
+      if (error) throw error;
+      res.status(200).json({ nurses: results });
     });
   } catch (error) {
     res.status(500).json({ error });

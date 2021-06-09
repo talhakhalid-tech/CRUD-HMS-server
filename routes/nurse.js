@@ -5,10 +5,10 @@ const router = express.Router();
 
 router.get("/all", async (req, res) => {
   try {
-    const sql = `SELECT * FROM ambulance`;
+    const sql = `SELECT * FROM nurse`;
     mysql.query(sql, function (error, results) {
       if (error) throw error;
-      res.status(201).json({ ambulances: results });
+      res.status(201).json({ nurses: results });
     });
   } catch (error) {
     res.status(500).json({ error });
@@ -50,22 +50,6 @@ router.patch("/update", async (req, res) => {
     mysql.query(sql, function (error, results) {
       if (error) throw error;
       res.status(201).json({ message: "Updated Ambulance Data Successfully" });
-    });
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
-
-router.get("/relatedPatients", async (req, res) => {
-  try {
-    const sql = `SELECT ambulance.A_id,patient.P_id,patient.P_Name,patient.P_Disease,patient.P_BedNo
-    FROM ambulance
-    RIGHT JOIN patient
-    ON ambulance.A_id = patient.A_id
-    WHERE patient.A_id = ${req.query.AId};`;
-    mysql.query(sql, function (error, results) {
-      if (error) throw error;
-      res.status(200).json({ patients: results });
     });
   } catch (error) {
     res.status(500).json({ error });
