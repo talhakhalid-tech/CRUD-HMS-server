@@ -15,6 +15,19 @@ router.get("/all", async (req, res) => {
   }
 });
 
+router.get("/single", async (req, res) => {
+  try {
+    const sql = `SELECT * FROM ward 
+    WHERE W_id = ${req.query.wId}`;
+    mysql.query(sql, function (error, results) {
+      if (error) throw error;
+      res.status(200).json({ ward: results });
+    });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
 router.post("/create", async (req, res) => {
   try {
     const { wType, wFloor, wTotalBeds, wReservedBeds } = req.body;

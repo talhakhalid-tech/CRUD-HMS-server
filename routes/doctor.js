@@ -8,7 +8,20 @@ router.get("/all", async (req, res) => {
     const sql = `SELECT * FROM doctor`;
     mysql.query(sql, function (error, results) {
       if (error) throw error;
-      res.status(201).json({ doctors: results });
+      res.status(200).json({ doctors: results });
+    });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
+router.get("/single", async (req, res) => {
+  try {
+    const sql = `SELECT * FROM doctor 
+    WHERE D_id = ${req.query.dId}`;
+    mysql.query(sql, function (error, results) {
+      if (error) throw error;
+      res.status(200).json({ doctor: results });
     });
   } catch (error) {
     res.status(500).json({ error });
@@ -34,10 +47,14 @@ router.post("/create", async (req, res) => {
 
 router.delete("/delete", async (req, res) => {
   try {
-    const sql = `DELETE FROM doctor WHERE D_id = ${req.query.dId};`;
-    mysql.query(sql, function (error, results) {
+    const sqlDelete = `DELETE FROM doctor_nurse WHERE D_id = ${req.query.dId};`;
+    mysql.query(sqlDelete, function (error, results) {
       if (error) throw error;
-      res.status(202).json({ message: "Deleted Doctor Data Successfully" });
+      const sql = `DELETE FROM doctor WHERE D_id = ${req.query.dId};`;
+      mysql.query(sql, function (error, results) {
+        if (error) throw error;
+        res.status(202).json({ message: "Deleted Doctor Data Successfully" });
+      });
     });
   } catch (error) {
     res.status(500).json({ error });
@@ -85,6 +102,30 @@ router.post("/setRelatedNurses", async (req, res) => {
     mysql.query(sql, function (error, results) {
       if (error) throw error;
       res.status(201).json({ message: "Added Nurses Id's Successfully" });
+    });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
+router.patch("/updateRelatedNurses", async (req, res) => {
+  try {
+    const sqlDelete = `DELETE FROM doctor_nurse WHERE D_id = ${req.body.D_id};`;
+    mysql.query(sqlDelete, function (error, results) {
+      if (error) throw error;
+      if (req.body.N_id.length > 0) {
+        const sqlInner = req.body.N_id.map(
+          (id) => `(${req.body.D_id}, ${id})`
+        ).join(",");
+        const sql = `INSERT INTO doctor_nurse(D_id,N_id)
+      VALUES ${sqlInner}`;
+        mysql.query(sql, function (error, results) {
+          if (error) throw error;
+          res.status(201).json({ message: "Updated Nurses Id's Successfully" });
+        });
+      } else {
+        res.status(201).json({ message: "Updated Nurses Id's Successfully" });
+      }
     });
   } catch (error) {
     res.status(500).json({ error });

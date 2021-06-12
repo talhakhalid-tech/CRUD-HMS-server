@@ -31,10 +31,14 @@ router.post("/create", async (req, res) => {
 
 router.delete("/delete", async (req, res) => {
   try {
-    const sql = `DELETE FROM patient WHERE P_id = ${req.query.pId};`;
-    mysql.query(sql, function (error, results) {
+    const sqlDelete = `DELETE FROM patient_nurse WHERE P_id = ${req.query.pId};`;
+    mysql.query(sqlDelete, function (error, results) {
       if (error) throw error;
-      res.status(202).json({ message: "Deleted Patient Data Successfully" });
+      const sql = `DELETE FROM patient WHERE P_id = ${req.query.pId};`;
+      mysql.query(sql, function (error, results) {
+        if (error) throw error;
+        res.status(202).json({ message: "Deleted Patient Data Successfully" });
+      });
     });
   } catch (error) {
     res.status(500).json({ error });

@@ -15,6 +15,19 @@ router.get("/all", async (req, res) => {
   }
 });
 
+router.get("/single", async (req, res) => {
+  try {
+    const sql = `SELECT * FROM ambulance
+    WHERE A_id = ${req.query.aId}`;
+    mysql.query(sql, function (error, results) {
+      if (error) throw error;
+      res.status(200).json({ ambulance: results });
+    });
+  } catch (error) {
+    res.status(500).json({ error });
+  }
+});
+
 router.post("/create", async (req, res) => {
   try {
     const { aChasisNo, aEngineNo, aRoute, aModel } = req.body;
